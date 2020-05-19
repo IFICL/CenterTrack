@@ -338,7 +338,8 @@ def dla34(pretrained=True, **kwargs):  # DLA-34
         model.load_pretrained_model(
             data='imagenet', name='dla34', hash='ba72cf86')
     else:
-        print('Warning: No ImageNet pretrain!!')
+        # print('Warning: No ImageNet pretrain!!')
+        pass
     return model
 
 def dla102(pretrained=None, **kwargs):  # DLA-102
@@ -598,7 +599,7 @@ class DLASeg(BaseModel):
         down_ratio=4
         self.opt = opt
         self.node_type = DLA_NODE[opt.dla_node]
-        print('Using node type:', self.node_type)
+        print('Using node type:', self.node_type) if opt.message else None
         self.first_level = int(np.log2(down_ratio))
         self.last_level = 5
         self.base = globals()['dla{}'.format(num_layers)](

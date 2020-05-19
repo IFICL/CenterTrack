@@ -6,9 +6,18 @@ import argparse
 import os
 import sys
 
+
+
 class opts(object):
   def __init__(self):
     self.parser = argparse.ArgumentParser()
+
+    # My custom
+    self.parser.add_argument('--filter', default=False)
+    self.parser.add_argument('--message', default=False)
+    self.parser.add_argument('--videolist', default=0,type=int, choices=[0, 1, 2, 3], required=True)
+
+
     # basic experiment setting
     self.parser.add_argument('task', default='',
                              help='ctdet | ddd | multi_pose '
@@ -20,14 +29,14 @@ class opts(object):
                              help='coco | kitti | coco_hp | pascal')
     self.parser.add_argument('--exp_id', default='default')
     self.parser.add_argument('--test', action='store_true')
-    self.parser.add_argument('--debug', type=int, default=0,
+    self.parser.add_argument('--debug', type=int, default=1,
                              help='level of visualization.'
                                   '1: only show the final detection results'
                                   '2: show the network output features'
                                   '3: use matplot to display' # useful when lunching training with ipython notebook
                                   '4: save all visualizations to disk')
     self.parser.add_argument('--no_pause', action='store_true')
-    self.parser.add_argument('--demo', default='', 
+    self.parser.add_argument('--demo', default=None, 
                              help='path to image/ image folders/ video. '
                                   'or "webcam"')
     self.parser.add_argument('--load_model', default='',
@@ -260,6 +269,8 @@ class opts(object):
     if opt.test_dataset == '':
       opt.test_dataset = opt.dataset
     
+    opt.message = False
+
     opt.gpus_str = opt.gpus
     opt.gpus = [int(gpu) for gpu in opt.gpus.split(',')]
     opt.gpus = [i for i in range(len(opt.gpus))] if opt.gpus[0] >=0 else [-1]
@@ -275,18 +286,18 @@ class opts(object):
     opt.num_workers = max(opt.num_workers, 2 * len(opt.gpus))
     opt.pre_img = False
     if 'tracking' in opt.task:
-      print('Running tracking')
+      print('Running tracking') if opt.message else None
       opt.tracking = True
       opt.out_thresh = max(opt.track_thresh, opt.out_thresh)
       opt.pre_thresh = max(opt.track_thresh, opt.pre_thresh)
       opt.new_thresh = max(opt.track_thresh, opt.new_thresh)
       opt.pre_img = not opt.no_pre_img
-      print('Using tracking threshold for out threshold!', opt.track_thresh)
+      print('Using tracking threshold for out threshold!', opt.track_thresh) if opt.message else None
       if 'ddd' in opt.task:
         opt.show_track_color = True
 
     opt.fix_res = not opt.keep_res
-    print('Fix size testing.' if opt.fix_res else 'Keep resolution testing.')
+    print('Fix size testing.' if opt.fix_res else 'Keep resolution testing.') if opt.message else None
 
     if opt.head_conv == -1: # init default head_conv
       opt.head_conv = 256 if 'dla' in opt.arch else 64
@@ -303,7 +314,7 @@ class opts(object):
       if i < rest_batch_size % (len(opt.gpus) - 1):
         slave_chunk_size += 1
       opt.chunk_sizes.append(slave_chunk_size)
-    print('training chunk_sizes:', opt.chunk_sizes)
+    print('training chunk_sizes:', opt.chunk_sizes) if opt.message else None
 
     if opt.debug > 0:
       opt.num_workers = 0
@@ -377,10 +388,10 @@ class opts(object):
     opt.head_conv = {head: [opt.head_conv \
       for i in range(opt.num_head_conv if head != 'reg' else 1)] for head in opt.heads}
     
-    print('input h w:', opt.input_h, opt.input_w)
-    print('heads', opt.heads)
-    print('weights', opt.weights)
-    print('head conv', opt.head_conv)
+    print('input h w:', opt.input_h, opt.input_w) if opt.message else None
+    print('heads', opt.heads) if opt.message else None
+    print('weights', opt.weights) if opt.message else None
+    print('head conv', opt.head_conv) if opt.message else None
 
     return opt
 
@@ -393,8 +404,9 @@ class opts(object):
     }
     opt = self.parse()
     from dataset.dataset_factory import dataset_factory
-    train_dataset = default_dataset_info[opt.task] \
-      if opt.task in default_dataset_info else 'coco'
+    # train_dataset = default_dataset_info[opt.task] \
+    #   if opt.task in default_dataset_info else 'coco'
+    train_dataset = opt.dataset
     dataset = dataset_factory[train_dataset]
     opt = self.update_dataset_info_and_set_heads(opt, dataset)
     return opt

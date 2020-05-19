@@ -31,7 +31,8 @@ def create_model(arch, head, head_conv, opt=None):
 def load_model(model, model_path, opt, optimizer=None):
   start_epoch = 0
   checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
-  print('loaded {}, epoch {}'.format(model_path, checkpoint['epoch']))
+  print('loaded {}, epoch {}'.format(
+      model_path, checkpoint['epoch'])) if opt.message else None
   state_dict_ = checkpoint['state_dict']
   state_dict = {}
    
@@ -63,10 +64,10 @@ def load_model(model, model_path, opt, optimizer=None):
             k, model_state_dict[k].shape, state_dict[k].shape))
           state_dict[k] = model_state_dict[k]
     else:
-      print('Drop parameter {}.'.format(k))
+      print('Drop parameter {}.'.format(k)) if opt.message else None
   for k in model_state_dict:
     if not (k in state_dict):
-      print('No param {}.'.format(k))
+      print('No param {}.'.format(k)) if opt.message else None
       state_dict[k] = model_state_dict[k]
   model.load_state_dict(state_dict, strict=False)
 

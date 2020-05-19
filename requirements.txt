@@ -6,6 +6,6 @@ matplotlib
 easydict
 scipy
 pyquaternion
+motmetrics==1.1.3
 nuscenes-devkit
 pyyaml
-motmetrics

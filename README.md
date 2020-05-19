@@ -90,7 +90,10 @@ If setup correctly, you will see an output video like:
 Similarly, for 80-category tracking on images/ video, run:
 
 ~~~
-python demo.py tracking --load_model ../models/coco_tracking.pth --demo /path/to/image/or/folder/or/video 
+CUDA_VISIBLE_DEVICES=8 python demo.py tracking --dataset coco --load_model ../models/coco_tracking.pth --demo ../videos/MOT16-03.mp4 --save_video
+CUDA_VISIBLE_DEVICES=8 python demo.py tracking --dataset mot --load_model ../models/mot17_fulltrain.pth --demo ../videos/MOT16-03.mp4 --save_video
+
+CUDA_VISIBLE_DEVICES=8 python demo.py tracking --dataset kitti_tracking --load_model ../models/kitti_fulltrain.pth --demo ../videos/MOT16-03.mp4 --save_video
 ~~~
 
 For webcam demo, run     

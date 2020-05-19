@@ -79,7 +79,7 @@ def demo(opt):
 
       # track or detect the image.
       ret = detector.run(img)
-
+      # import pdb; pdb.set_trace()
       # log run time
       time_str = 'frame {} |'.format(cnt)
       for stat in time_stats:

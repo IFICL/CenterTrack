@@ -20,6 +20,7 @@ from utils.debugger import Debugger
 from utils.tracker import Tracker
 from dataset.dataset_factory import get_dataset
 
+from tqdm import tqdm
 
 class Detector(object):
   def __init__(self, opt):
@@ -28,7 +29,7 @@ class Detector(object):
     else:
       opt.device = torch.device('cpu')
     
-    print('Creating model...')
+    print('Creating model...') if opt.message else None
     self.model = create_model(
       opt.arch, opt.heads, opt.head_conv, opt=opt)
     self.model = load_model(self.model, opt.load_model, opt)
@@ -97,7 +98,7 @@ class Detector(object):
       if self.opt.tracking:
         # initialize the first frame
         if self.pre_images is None:
-          print('Initialize tracking!')
+          print('Initialize tracking!') if self.opt.message else None
           self.pre_images = images
           self.tracker.init_track(
             meta['pre_dets'] if 'pre_dets' in meta else [])
