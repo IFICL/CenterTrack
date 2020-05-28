@@ -13,7 +13,7 @@ class opts(object):
     self.parser = argparse.ArgumentParser()
 
     # My custom
-    self.parser.add_argument('--filter', default=False)
+    self.parser.add_argument('--filter', default=True)
     self.parser.add_argument('--message', default=False)
     self.parser.add_argument('--videolist', default=0,type=int, choices=[0, 1, 2, 3], required=True)
 
@@ -269,7 +269,7 @@ class opts(object):
     if opt.test_dataset == '':
       opt.test_dataset = opt.dataset
     
-    opt.message = False
+    opt.message = True
 
     opt.gpus_str = opt.gpus
     opt.gpus = [int(gpu) for gpu in opt.gpus.split(',')]

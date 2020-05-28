@@ -16,23 +16,23 @@ from opts import opts
 from detector import Detector
 
 # CUDA_VISIBLE_DEVICES=0 python mydemo.py tracking --videolist=0
-# For videolist 0: processed up to 4/8
-# For videolist 1: processed up to 5/8
+# For videolist 0: processed up to 5/8
+# For videolist 1: processed up to 6/8
 # For videolist 2: processed up to 
-# For videolist 3: processed up to 3/7
+# For videolist 3: processed up to 4/7
 
 
 def create_dirlist(dirlist, opt):
     if opt.videolist == 0:
-        out = dirlist[4:]
-    elif opt.videolist == 1:
         out = dirlist[5:]
+    elif opt.videolist == 1:
+        out = dirlist[6:]
     elif opt.videolist == 2:
         # out = dirlist[5:]
         print('This video list has processed!')
         sys.exit()
     elif opt.videolist == 3:
-        out = dirlist[3:]
+        out = dirlist[4:]
     return out
 
 
@@ -133,7 +133,7 @@ def save_and_exit(opt, out=None, results=None, dirname=None, idx=None):
         save_dir = os.path.join(dirname, str(idx).zfill(8) + '.json')
         tqdm.write('saving results to {}'.format(save_dir))
         json.dump(_to_list(copy.deepcopy(results)),
-                open(save_dir, 'w'))
+                open(save_dir, 'w'), indent=2)
     if opt.save_video and out is not None:
         out.release()
     # sys.exit(0)
@@ -162,28 +162,27 @@ def process():
     opt.debug = 0
     opt.filter = True
     data_folder = '../binaural-tour/img_audio'
-    video_len = 5   # 5 seconds
+    video_len = 10   # 10 seconds
+
+    
     dirlist = os.listdir(data_folder)
     dirlist.sort()
     count = 8
     dirlist = dirlist[opt.videolist * count: min((opt.videolist+1) * count, len(dirlist))]
-    # to continue
     dirlist = create_dirlist(dirlist, opt)
-    # import pdb; pdb.set_trace()
+    
     for dirname in tqdm(dirlist, desc="Video Processing"):
         datapath = os.path.join(data_folder, dirname)
-        csv_path = os.path.join(datapath, 'meta.csv')
+        json_path = os.path.join(datapath, 'meta.json')
         frame_path = os.path.join(datapath, 'frames')
 
         mot_path = os.path.join(datapath, 'mot')
         if not os.path.exists(mot_path):
             os.mkdir(mot_path)
         
-        # load csv
-        meta = []
-        for row in csv.reader(open(csv_path, 'r'), delimiter=','):
-            meta.append(row)
-        fps = float(meta[2][0].split(':')[-1][1:-1])
+        # load json
+        meta = json.load(json_path)
+        fps = meta['fps']
         frame_len = int(fps * video_len)
 
         read_list = glob.glob('%s/*.jpg' % frame_path)
@@ -196,10 +195,6 @@ def process():
             opt.demo = image_list
             demo(opt, i, mot_path)
     
-
-
-
-
 
 
 if __name__ == '__main__':

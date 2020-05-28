@@ -21,6 +21,7 @@ time_stats = ['tot', 'load', 'pre', 'net', 'dec', 'post', 'merge', 'display']
 def demo(opt):
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
   opt.debug = max(opt.debug, 1)
+
   detector = Detector(opt)
 
   if opt.demo == 'webcam' or \
@@ -93,8 +94,8 @@ def demo(opt):
       # save debug image to video
       if opt.save_video:
         out.write(ret['generic'])
-        if not is_video:
-          cv2.imwrite('../results/demo{}.jpg'.format(cnt), ret['generic'])
+        # if not is_video:
+        cv2.imwrite('../results/demo{}.jpg'.format(cnt), ret['generic'])
       
       # esc to quit and finish saving video
       if cv2.waitKey(1) == 27:
